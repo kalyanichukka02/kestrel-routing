@@ -1,0 +1,59 @@
+DATA: 10822 train requests, 2025-04..2026-06 (15 months, not 18); test 2178 rows
+Time split: fit on 2025-04..2026-03 (8687 rows), validate on 2026-04..2026-06 (2135 rows) - never seen in fitting
+
+1. THE BOT vs where requests actually ended: label==final 77.2% on all train, 76.7% on validation months
+   bot queue Billing                  n= 1656  ended there 64.7%
+   bot queue Filters & Consumables    n= 1458  ended there 59.8%
+   bot queue Installs & Demo          n= 1185  ended there 96.7%
+   bot queue Product Advice           n= 1180  ended there 96.2%
+   bot queue Repairs                  n= 3129  ended there 63.7%
+   bot queue Returns & Replacement    n= 1174  ended there 96.4%
+   bot queue Warranty Claims          n= 1040  ended there 96.3%
+
+2. WHICH TARGET TO TRAIN ON (valid months)         acc vs BOT label | acc vs FINAL team
+   model trained on BOT                             95.0%          |  76.2%
+   model trained on FINAL                           77.4%          |  83.7%
+   (reference: the bot itself vs FINAL team = 76.7%)
+
+3. EXPECTED SCORE (accuracy vs final team, final-target model): 83.7%, bootstrap 95% CI 82.2%-85.3%
+   same model vs BOT label: 77.4%
+   macro-F1 vs final team: 0.833
+   (random 5-fold on all train, for comparison: 83.5% - time split is the honest one)
+
+4. CONFIDENCE (valid months)  bin: share of requests | accuracy vs final | bot accuracy on same rows
+   (0.0, 0.4]     8.2% |  17.6% |  18.2%
+   (0.4, 0.5]     4.2% |  25.6% |  25.6%
+   (0.5, 0.6]     3.1% |  43.9% |  57.6%
+   (0.6, 0.7]     2.3% |  56.0% |  58.0%
+   (0.7, 0.8]     2.2% |  68.1% |  72.3%
+   (0.8, 0.9]     3.2% |  82.4% |  77.9%
+   (0.9, 1.0]    76.7% |  97.0% |  87.2%
+   threshold 0.6: routes 84.4% of requests at 94.6% accuracy (bot on those rows: 85.6%); asks a question on 15.6% (model 25.0%, bot 28.0% right there)
+
+5. PER-TEAM (valid months): team | recall | precision
+   Billing                   85.5% |  85.8%
+   Filters & Consumables     82.1% |  81.3%
+   Installs & Demo           83.8% |  84.9%
+   Product Advice            79.6% |  82.9%
+   Repairs                   88.0% |  85.4%
+   Returns & Replacement     81.3% |  83.3%
+   Warranty Claims           82.6% |  80.5%
+   most common confusions (final -> predicted): {('Product Advice', 'Repairs'): 23, ('Returns & Replacement', 'Repairs'): 16, ('Repairs', 'Returns & Replacement'): 16, ('Warranty Claims', 'Returns & Replacement'): 12, ('Installs & Demo', 'Repairs'): 12}
+
+6. MONEY (policy s4: transfer Rs 305, extra contact Rs 260)
+   bot's misroutes, whole train: 2696 requests needed >=1 transfer (24.9%); 3902 transfers -> Rs 1,891,070 over 15 months = Rs 1,512,856/year; avg Rs 701 per misrouted request
+   validation months: bot cost Rs 374,300; model (abstain rows cost same as today) Rs 240,806; model (abstain rows +Rs 260 for the question) Rs 327,126
+   => saving per year, scaled from 3 months: Rs 533,977 (base) / Rs 188,697 (conservative)
+   plus bot licence Rs 320,000/year. Requests per month in data: 721
+
+7. BUSIEST TEAMS (share of requests): team | by bot label | where it actually ended
+   Billing                   15.3% |  12.2%
+   Filters & Consumables     13.5% |   9.9%
+   Installs & Demo           10.9% |  14.7%
+   Product Advice            10.9% |  12.8%
+   Repairs                   28.9% |  23.4%
+   Returns & Replacement     10.8% |  14.2%
+   Warranty Claims            9.6% |  12.7%
+
+8. DRIFT CHECK, test (Jul-Sep 2026) vs validation: share of test rows with confidence >= 0.6: 85.2% (valid 84.4%); mean confidence 0.870 (valid 0.869); words never seen in fitting: 9.8% (valid 10.0%)
+   predicted team mix on test: {'Repairs': 0.252, 'Installs & Demo': 0.15, 'Returns & Replacement': 0.14, 'Product Advice': 0.124, 'Warranty Claims': 0.12, 'Billing': 0.12, 'Filters & Consumables': 0.095}

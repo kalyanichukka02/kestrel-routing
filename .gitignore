@@ -1,0 +1,7 @@
+# Policy s10: customer/operational data must not go to public repos
+data/
+model/
+predictions.csv
+__pycache__/
+*.pyc
+.venv/

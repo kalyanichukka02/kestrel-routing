@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kestrel - where should this request go?</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#1c2430;--mut:#667085;--line:#d9dee7;--ok:#0b7a3b;--warn:#a15c00;--acc:#1f4fd8}
+@media(prefers-color-scheme:dark){:root{--bg:#12161c;--card:#1b212b;--ink:#e8ecf2;--mut:#98a2b3;--line:#2c3542;--ok:#4cc38a;--warn:#f0b34a;--acc:#7aa2ff}}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+main{max-width:760px;margin:0 auto;padding:24px 16px}h1{font-size:20px;margin:0 0 4px}p.s{color:var(--mut);margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:14px}
+label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}textarea,select{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+textarea{min-height:84px;resize:vertical}.row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}@media(max-width:600px){.row{grid-template-columns:1fr}}
+button{margin-top:14px;padding:10px 18px;border:0;border-radius:8px;background:var(--acc);color:#fff;font:inherit;cursor:pointer}button.l{background:transparent;color:var(--acc);border:1px solid var(--line);padding:5px 10px;margin:0 6px 6px 0;font-size:13px}
+.team{font-size:24px;font-weight:600;margin:0}.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:13px;border:1px solid var(--line)}
+.ok{color:var(--ok)}.warn{color:var(--warn)}ul{margin:6px 0 0;padding-left:20px}.mut{color:var(--mut);font-size:13px}.err{color:#c0392b}
+</style></head><body><main>
+<h1>Where should this service request go?</h1><p class="s">Type or paste the customer's message. The tool suggests a team and shows why. It never guesses when it is unsure.</p>
+<div class="card">
+<div class="mut">Try an example:</div>
+<button class="l" data-t="hi, i already paid for the installation, when will the technician come for my air fryer" data-p="Air Fryer">paid + installation</button>
+<button class="l" data-t="water purifier leaking from the bottom and not working" data-p="Water Purifier">purifier breakdown</button>
+<button class="l" data-t="please call me about my purifier" data-p="Water Purifier">vague call-me</button>
+<button class="l" data-t="charged twice for my mixer grinder order, need refund" data-p="Mixer Grinder">double charge</button>
+<label for="t">Customer's message</label><textarea id="t"></textarea>
+<div class="row"><div><label for="c">Channel</label><select id="c"><option>chat</option><option>whatsapp</option><option>ivr</option><option>email</option></select></div>
+<div><label for="p">Product</label><select id="p"><option>Air Fryer</option><option>Mixer Grinder</option><option>Water Purifier</option><option>Robot Vacuum</option><option>Induction Cooktop</option><option>Ceiling Fan</option><option>Room Heater</option></select></div>
+<div><label for="w">Warranty</label><select id="w"><option value="in_warranty">in warranty</option><option value="shield">Kestrel Shield</option><option value="out_of_warranty">out of warranty</option></select></div></div>
+<button id="go">Suggest a team</button></div>
+<div id="out"></div></main>
+<script>
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+document.querySelectorAll('button.l').forEach(b=>b.onclick=()=>{$('t').value=b.dataset.t;$('p').value=b.dataset.p;go()});
+$('go').onclick=go;
+async function go(){const out=$('out');out.innerHTML='<div class="card mut">Working...</div>';
+ try{const r=await fetch('/route',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({request_text:$('t').value,channel:$('c').value,product_family:$('p').value,warranty_status:$('w').value})});
+ const j=await r.json();if(!r.ok){out.innerHTML='<div class="card err">'+esc(j.error||'Something went wrong')+'</div>';return}
+ const q=j.needs_question;
+ out.innerHTML='<div class="card"><p class="mut" style="margin:0">Suggested team</p><p class="team '+(q?'warn':'ok')+'">'+(q?'Not sure - ask a question':esc(j.team))+'</p>'+
+ '<span class="pill">confidence '+Math.round(j.confidence*100)+'%</span> <span class="pill">best guess: '+esc(j.team)+'</span>'+
+ '<p><b>'+esc(q?j.suggested_question:j.advice)+'</b></p><div class="mut">Why</div><ul>'+j.reasons.map(x=>'<li>'+esc(x)+'</li>').join('')+j.policy_notes.map(x=>'<li class="warn">'+esc(x)+'</li>').join('')+'</ul>'+
+ '<p class="mut">Next most likely: '+j.alternatives.map(a=>esc(a.team)+' ('+Math.round(a.confidence*100)+'%)').join(', ')+'</p></div>'}
+ catch(e){out.innerHTML='<div class="card err">Could not reach the service. Is it running?</div>'}}
+</script></body></html>
