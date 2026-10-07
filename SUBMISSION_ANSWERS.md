@@ -32,7 +32,7 @@ Claude (chat assistant) for planning, writing the pandas/scikit-learn code, anal
 
 **11. Honest hours spent:** 5 hours
 
-**12. GitHub repo link:** https://github.com/kalyanichukka02/kestrel-routing/tree/main 
+**12. GitHub repo link:** https://github.com/kalyanichukka02/kestrel-routing/tree/main
 
 **13. What does one prediction cost, and what would a month cost at ~700 orders a month?**
 Rs 0 per prediction: no paid API calls; a prediction takes a few milliseconds on a laptop CPU. 700 x Rs 0 = Rs 0 per month in AI charges. Hosting (any small server) is not priced; retraining takes ~5 seconds. If an LLM were used at, say, 300 tokens per request, the bill would grow with each request, which Farhan asked to avoid.
