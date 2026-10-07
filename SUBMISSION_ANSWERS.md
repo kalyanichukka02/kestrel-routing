@@ -23,7 +23,7 @@ LLM routing (I did not test one: cost grows per request and customer text would 
 Headcount shares by where work ended (Repairs 23% not 29%, Billing 12% not 15%, Consumables 10% not 14%); the "paid for installation" pattern (86% sent to Billing, 21% belong there) with a policy note on the screen; the 15-vs-18-month discrepancy; the Zoho time-zone bug; the mojibake rows.
 
 **8. What did you use AI for?** 
-Claude (chat assistant) for planning, writing the pandas/scikit-learn code, analysis, and drafting the docs and memo. Helped: spotting that the bot's labels only match real outcomes 77% of the time, and the validation design. Wasted time / discarded: a more complex character n-gram model (dropped for a readable one), and the plan to train on the bot's own labels (dropped as the target). No AI model runs inside the product. What I did myself: checked the numbers, decided what to train on, uploaded the repo and files, and recorded the video. Cost: Rs 0 [only if true: see below]. Recording: https://youtu.be/jEY6pWsRWPA
+Claude (chat assistant) for planning, writing the pandas/scikit-learn code, analysis, and drafting the docs and memo. Helped: spotting that the bot's labels only match real outcomes 77% of the time, and the validation design. Wasted time / discarded: a more complex character n-gram model (dropped for a readable one), and the plan to train on the bot's own labels (dropped as the target). No AI model runs inside the product. What I did myself: checked the numbers, decided what to train on, uploaded the repo and files, and recorded the video. Cost: Rs 0 (free claude palnning). Recording: https://youtu.be/jEY6pWsRWPA
 
 **9. Public Google Drive link:** https://drive.google.com/drive/folders/1YHbixnmcgF0owa8SjzHJ17M1V6_jZfOc?usp=drive_link
 
